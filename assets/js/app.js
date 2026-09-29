@@ -23,7 +23,7 @@
   }
 
   /* ---------- índice de busca, feito uma vez ---------- */
-  CATALOGO.forEach(function (p) { p._b = semAcento(p.n + " " + p.d); });
+  CATALOGO.forEach(function (p) { p._b = semAcento(p.n + " " + p.c + " " + p.dp); });
 
   function corDoSetor(id) {
     var s = SETORES.filter(function (x) { return x.id === id; })[0];
@@ -191,7 +191,7 @@
     div.innerHTML =
       '<div class="item-foto">' + foto + "</div>" +
       '<div class="item-corpo">' +
-        '<span class="item-cat">' + p.d + "</span>" +
+        '<span class="item-cat">' + p.c + "</span>" +
         '<h3 class="item-nome">' + p.n + "</h3>" +
         '<div class="item-baixo">' +
           '<span class="item-preco mono">' + dinheiro(p.p) +
