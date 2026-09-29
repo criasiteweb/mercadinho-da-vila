@@ -1,10 +1,10 @@
-# Mercadinho da Vila — briefing do Matheus
+# Mercado Já — briefing do Matheus
 
 Aberto em 29/09/2026. Projeto novo, **não** é o mercado-modelo (Mercado Bom Preço).
 Este aqui é feito do zero, com proposta visual própria.
 
 ## Nome e marca
-- Nome: **Mercadinho da Vila**
+- Nome: **Mercado Já**
 - Logo pode ser ilustrativo, só para apresentar. Não é a marca final.
 
 ## Visual

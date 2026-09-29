@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# Gera assets/js/catalogo.js do Mercadinho da Vila (Cria Site).
+# Gera assets/js/catalogo.js do Mercado Já (Cria Site).
 # 1. Espelha os produtos do mercado-modelo (Mercado e Pet).
 # 2. Reclassifica tudo em categorias que o cliente entende (arroz, feijao, molho...).
 # 3. Cria Adega e Padaria com produtos de base e preco de referencia.
@@ -299,7 +299,7 @@ catalogo += montar("padaria", PADARIA, "pd")
 
 # ---------------------------------------------------------------- grava
 conta = collections.Counter(p["s"] for p in catalogo)
-cabecalho = """/* Mercadinho da Vila - catalogo de demonstracao (Cria Site)
+cabecalho = """/* Mercado Já - catalogo de demonstracao (Cria Site)
    Gerado por gerar-catalogo.py em 29/09/2026.
 
    Mercado e Pet: espelhados do modelo Mercado Bom Preco, com foto real.

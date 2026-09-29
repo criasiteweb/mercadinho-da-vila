@@ -1,4 +1,4 @@
-/* Mercadinho da Vila — configuração da loja e camada de pedidos (Cria Site)
+/* Mercado Já — configuração da loja e camada de pedidos (Cria Site)
 
    O pedido NÃO vai para o WhatsApp. Ele entra no sistema:
    fica gravado, ganha número, aparece no painel da loja e muda de status.
@@ -10,7 +10,7 @@
 */
 
 const LOJA = {
-  nome: "Mercadinho da Vila",
+  nome: "Mercado Já",
   entregaMedia: "38 min",
   taxas: [
     { bairro: "Centro",        valor: 6.9,  minutos: 30 },

@@ -1,4 +1,4 @@
-/* Mercadinho da Vila — vitrine, abas, busca, carrinho e checkout (Cria Site) */
+/* Mercado Já — vitrine, abas, busca, carrinho e checkout (Cria Site) */
 
 (function () {
   "use strict";

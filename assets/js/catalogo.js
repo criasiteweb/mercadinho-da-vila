@@ -1,4 +1,4 @@
-/* Mercadinho da Vila - catalogo de demonstracao (Cria Site)
+/* Mercado Já - catalogo de demonstracao (Cria Site)
    Gerado por gerar-catalogo.py em 29/09/2026.
 
    Mercado e Pet: espelhados do modelo Mercado Bom Preco, com foto real.

@@ -393,3 +393,26 @@ button{font-family:inherit}
   .parede-fila{transform:none}
 }
 .titulao .ln:nth-child(4) > i{animation-delay:.27s}
+
+/* carrinho grande atras da abertura */
+.carrinho-fundo{
+  position:absolute;
+  z-index:0;
+  right:clamp(-70px,-4vw,0px);
+  top:50%;
+  width:clamp(430px,54vw,780px);
+  transform:translateY(-52%) rotate(-5deg);
+  color:var(--viva);
+  opacity:.07;
+  pointer-events:none;
+  animation:carrinho-boia 11s ease-in-out infinite;
+  transition:color .5s ease;
+}
+@keyframes carrinho-boia{
+  0%,100%{transform:translateY(-52%) rotate(-5deg)}
+  50%{transform:translateY(-56%) rotate(-3deg)}
+}
+@media(max-width:999px){
+  .carrinho-fundo{right:-16%;width:130%;opacity:.055}
+}
+@media (prefers-reduced-motion: reduce){ .carrinho-fundo{animation:none} }
