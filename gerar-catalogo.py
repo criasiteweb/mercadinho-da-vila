@@ -132,6 +132,26 @@ def classificar(nome, grupo, d=""):
     return TROCO_GRUPO.get(grupo, "Outros")
 
 
+
+# ---------------------------------------------------------------- unidade de venda
+# "kg" = vendido por peso, o cliente escolhe quantos gramas.
+# "un" = vendido por unidade, pacote fechado.
+PESO_CAT = {"Frutas", "Verduras e legumes", "Carne bovina", "Frango", "Carne suina",
+            "Peixe e frutos do mar", "Acougue", "Peixaria", "Temperos frescos",
+            "Frios fatiados na hora"}
+PESO_PALAVRA = re.compile(r"(?<![a-z0-9])(kg|granel|quilo)(?![a-z])")
+
+
+def unidade(nome, categoria):
+    n = sem_acento(nome)
+    if PESO_PALAVRA.search(n):
+        return "kg"
+    if re.search(r"(?<![a-z0-9])(\d+\s?(g|ml|l|un|unidades?|pacote|caixa|lata|garrafa|duzia))", n):
+        return "un"
+    if categoria in PESO_CAT:
+        return "kg"
+    return "un"
+
 # ---------------------------------------------------------------- espelho
 bruto = io.open(ORIGEM, encoding="utf-8").read()
 i = bruto.index("const CARDAPIO")
@@ -156,6 +176,7 @@ for p in prods:
         "c": cat,
         "n": p["n"],
         "p": p["p"],
+        "u": unidade(p["n"], cat),
         "foto": p.get("foto", ""),
     })
 
@@ -235,6 +256,88 @@ PADARIA = [
 ]
 
 
+
+ADEGA += [
+    ("Cerveja", [
+        ("Cerveja lager lata 350ml", 4.79), ("Cerveja premium lata 350ml", 6.29),
+        ("Cerveja trigo garrafa 600ml", 13.90), ("Cerveja escura long neck 355ml", 11.90),
+        ("Cerveja sem gluten lata 350ml", 7.90), ("Cerveja lata 473ml", 6.90),
+        ("Pack cerveja long neck 6 unidades", 39.90), ("Barril chopp 5L", 129.90),
+        ("Cerveja pilsen barril 30L", 349.90), ("Cerveja artesanal IPA 500ml", 19.90),
+        ("Cerveja artesanal weiss 500ml", 18.90), ("Cerveja lata 350ml pack 6", 25.90),
+    ]),
+    ("Vinho", [
+        ("Vinho tinto cabernet 750ml", 49.90), ("Vinho tinto merlot 750ml", 47.90),
+        ("Vinho tinto malbec 750ml", 69.90), ("Vinho branco chardonnay 750ml", 52.90),
+        ("Vinho verde 750ml", 44.90), ("Vinho do porto 750ml", 89.90),
+        ("Espumante prosecco 750ml", 69.90), ("Vinho tinto suave 1L", 26.90),
+        ("Vinho frisante 750ml", 34.90), ("Kit vinho e taca", 79.90),
+    ]),
+    ("Destilado", [
+        ("Whisky 1L nacional", 54.90), ("Vodka saborizada 900ml", 44.90),
+        ("Gin com especiarias 750ml", 89.90), ("Cachaca envelhecida 700ml", 44.90),
+        ("Licor de cacau 750ml", 49.90), ("Aperitivo amargo 900ml", 39.90),
+        ("Saque 740ml", 59.90), ("Tequila ouro 750ml", 139.90),
+        ("Vermute 1L", 34.90), ("Steinhager 600ml", 39.90),
+    ]),
+    ("Gelo e acompanhamento", [
+        ("Gelo em cubos 5kg", 24.90), ("Agua com gas 500ml", 3.99),
+        ("Refrigerante para drink 2L", 11.90), ("Energetico lata 473ml", 13.90),
+        ("Suco de cranberry 1L", 19.90), ("Azeitona sem caroco 200g", 12.90),
+        ("Mix de castanhas 200g", 24.90), ("Batata chips 100g", 12.90),
+        ("Taca de vinho unidade", 14.90), ("Abridor de garrafa", 12.90),
+        ("Saca rolha", 19.90), ("Cooler 12L", 89.90),
+    ]),
+]
+
+PADARIA += [
+    ("Pao", [
+        ("Pao frances meio kg", 9.50), ("Pao australiano unidade", 12.90),
+        ("Pao de batata unidade", 4.50), ("Pao de milho unidade", 4.90),
+        ("Pao caseiro unidade", 16.90), ("Pao de centeio kg", 27.90),
+        ("Pao multigraos kg", 29.90), ("Broa de fuba unidade", 12.90),
+        ("Pao de mel unidade", 6.90), ("Rosca doce unidade", 14.90),
+        ("Bisnaguinha pacote 300g", 8.90), ("Torrada pacote 160g", 9.90),
+    ]),
+    ("Salgado e lanche", [
+        ("Pastel de carne unidade", 9.90), ("Pastel de queijo unidade", 9.90),
+        ("Kibe unidade", 8.50), ("Risoles de frango unidade", 8.50),
+        ("Bauru unidade", 16.90), ("Sanduiche natural unidade", 13.90),
+        ("Torta de frango fatia", 15.90), ("Escondidinho porcao", 24.90),
+        ("Joelho de presunto unidade", 9.90), ("Folheado de frango unidade", 10.90),
+        ("Pao na chapa unidade", 8.90), ("Misto na chapa unidade", 13.90),
+    ]),
+    ("Doce e confeitaria", [
+        ("Bolo de chocolate fatia", 10.90), ("Bolo de laranja fatia", 8.90),
+        ("Bolo de milho fatia", 8.90), ("Torta holandesa fatia", 18.90),
+        ("Torta de limao fatia", 16.90), ("Pave fatia", 14.90),
+        ("Eclair unidade", 9.90), ("Cannoli unidade", 11.90),
+        ("Cocada unidade", 5.90), ("Quindim unidade", 6.90),
+        ("Beijinho unidade", 4.50), ("Bolo de aniversario 1kg", 89.90),
+    ]),
+    ("Frios fatiados na hora", [
+        ("Presunto parma fatiado 100g", 34.90), ("Copa fatiada 100g", 18.90),
+        ("Blanquet de peru fatiado 200g", 14.90), ("Queijo gouda fatiado 200g", 27.90),
+        ("Queijo coalho 500g", 29.90), ("Linguica calabresa defumada kg", 39.90),
+    ]),
+    ("Cafe da manha", [
+        ("Cafe expresso 60ml", 6.50), ("Cafe com leite grande 400ml", 9.90),
+        ("Chocolate quente 300ml", 11.90), ("Cha quente 300ml", 6.90),
+        ("Suco de melancia 400ml", 11.90), ("Acai na tigela 300ml", 19.90),
+        ("Iogurte com granola 250ml", 14.90), ("Tapioca simples unidade", 12.90),
+    ]),
+]
+
+
+ARTE = {
+    "Cerveja": "lata", "Vinho": "garrafa", "Destilado": "garrafa",
+    "Gelo e acompanhamento": "copo",
+    "Pao": "pao", "Salgado e lanche": "salgado", "Doce e confeitaria": "bolo",
+    "Frios fatiados na hora": "fatia", "Cafe da manha": "xicara",
+    "Verduras e legumes": "folha", "Ovos": "ovo", "Temperos frescos": "folha",
+}
+
+
 def montar(setor, blocos, prefixo):
     saida = []
     k = 0
@@ -247,6 +350,8 @@ def montar(setor, blocos, prefixo):
                 "c": categoria,
                 "n": nome,
                 "p": preco,
+                "u": unidade(nome, categoria),
+                "arte": ARTE.get(categoria, "caixa"),
                 "foto": "",
             })
     return saida
@@ -325,6 +430,7 @@ io.open(DESTINO, "w", encoding="utf-8").write(
 )
 
 print("total:", len(catalogo), dict(conta))
+print("\npor unidade de venda:", dict(collections.Counter(p["u"] for p in catalogo)))
 for s in ("mercado", "horti", "adega", "padaria", "pet"):
     cats = collections.Counter(p["c"] for p in catalogo if p["s"] == s)
     print("\n" + s, "->", len(cats), "categorias")

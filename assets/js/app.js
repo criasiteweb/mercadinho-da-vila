@@ -118,24 +118,47 @@
     });
   }
 
+
+  /* ---------- desenho ilustrativo para quem nao tem foto ---------- */
+  var ARTES = {
+    lata:    '<rect x="26" y="14" width="28" height="52" rx="7"/><rect x="30" y="24" width="20" height="18" rx="3" opacity=".45"/>',
+    garrafa: '<rect x="34" y="8" width="12" height="20" rx="4"/><path d="M30 28h20c4 0 7 4 7 9v30c0 5-3 9-7 9H30c-4 0-7-4-7-9V37c0-5 3-9 7-9z"/><rect x="28" y="44" width="24" height="16" rx="3" opacity=".4"/>',
+    copo:    '<path d="M24 20h32l-4 48c0 4-3 6-12 6s-12-2-12-6L24 20z"/><rect x="28" y="26" width="24" height="10" rx="2" opacity=".4"/>',
+    pao:     '<path d="M14 46c0-14 12-24 26-24s26 10 26 24c0 9-8 15-26 15s-26-6-26-15z"/><path d="M26 38c6-4 10-5 14-5s8 1 14 5" stroke="#fff" stroke-width="4" fill="none" opacity=".55"/>',
+    salgado: '<path d="M40 14c10 0 18 10 18 24s-8 28-18 28-18-14-18-28 8-24 18-24z"/><path d="M34 34c4-3 8-3 12 0" stroke="#fff" stroke-width="4" fill="none" opacity=".5"/>',
+    bolo:    '<path d="M18 40h44v26a4 4 0 01-4 4H22a4 4 0 01-4-4V40z"/><path d="M18 40c0-7 10-12 22-12s22 5 22 12" opacity=".55"/><rect x="38" y="12" width="4" height="12" rx="2"/>',
+    fatia:   '<rect x="16" y="26" width="48" height="30" rx="6"/><rect x="22" y="34" width="36" height="5" rx="2.5" fill="#fff" opacity=".5"/><rect x="22" y="44" width="24" height="5" rx="2.5" fill="#fff" opacity=".35"/>',
+    xicara:  '<path d="M20 28h34v22c0 8-6 14-17 14s-17-6-17-14V28z"/><path d="M54 34h6a7 7 0 010 14h-6" stroke-width="5" fill="none" stroke="currentColor"/>',
+    folha:   '<path d="M40 14c16 0 26 12 26 26S54 68 40 68 14 56 14 40 24 14 40 14z" opacity=".25"/><path d="M40 16c14 8 18 22 12 34-10 4-20-4-22-14-2-9 3-16 10-20z"/>',
+    ovo:     '<ellipse cx="40" cy="44" rx="20" ry="26"/><ellipse cx="33" cy="36" rx="6" ry="9" fill="#fff" opacity=".35"/>',
+    caixa:   '<rect x="18" y="24" width="44" height="42" rx="6"/><path d="M18 36h44" opacity=".45"/><rect x="34" y="14" width="12" height="12" rx="3" opacity=".6"/>'
+  };
+
+  function desenho(p) {
+    var d = ARTES[p.arte] || ARTES.caixa;
+    return '<svg class="item-arte" viewBox="0 0 80 80" fill="currentColor" aria-hidden="true">' + d + "</svg>";
+  }
+
   function cartao(p, i) {
     var div = document.createElement("article");
     div.className = "item";
     div.style.animationDelay = Math.min(i, 14) * 22 + "ms";
     var foto = p.foto
       ? '<img src="' + p.foto + '" alt="" loading="lazy" onerror="this.parentNode.innerHTML=\'<span class=&quot;item-vazio&quot;>' + (p.n[0] || "?") + '</span>\'">'
-      : '<span class="item-vazio">' + (p.n[0] || "?") + "</span>";
+      : desenho(p);
     div.innerHTML =
       '<div class="item-foto">' + foto + "</div>" +
       '<div class="item-corpo">' +
         '<span class="item-cat">' + p.d + "</span>" +
         '<h3 class="item-nome">' + p.n + "</h3>" +
         '<div class="item-baixo">' +
-          '<span class="item-preco mono">' + dinheiro(p.p) + "</span>" +
+          '<span class="item-preco mono">' + dinheiro(p.p) +
+            (p.u === "kg" ? '<i class="por-kg">o kg</i>' : "") + "</span>" +
           '<button class="item-add" type="button" aria-label="Adicionar ' + p.n + ' ao carrinho">+</button>' +
         "</div>" +
       "</div>";
     div.querySelector(".item-add").addEventListener("click", function (ev) {
+      if (p.u === "kg") { telaPeso(p); return; }
       adicionar(p);
       var b = ev.currentTarget;
       b.textContent = "✓";
@@ -173,11 +196,74 @@
     }
   }
 
+
+  /* ---------- quanto o cliente quer, quando o produto e por peso ---------- */
+  var PESOS = [0.2, 0.3, 0.5, 0.75, 1, 1.5, 2, 3];
+
+  function emPeso(q) {
+    return q < 1 ? Math.round(q * 1000) + " g" : String(q).replace(".", ",") + " kg";
+  }
+
+  function telaPeso(p) {
+    var botoes = PESOS.map(function (q) {
+      return '<button class="peso-op" type="button" data-q="' + q + '">' +
+        "<b>" + emPeso(q) + "</b><span class='mono'>" + dinheiro(p.p * q) + "</span></button>";
+    }).join("");
+
+    abrirJanela(
+      "<h2>Quanto voce quer?</h2>" +
+      '<p style="color:var(--apagado);font-size:15px">' + p.n +
+        ' · <b class="mono">' + dinheiro(p.p) + " o kg</b></p>" +
+      '<div class="peso-grade">' + botoes + "</div>" +
+      '<div class="campo"><label for="pesoLivre">Ou digite em gramas</label>' +
+        '<input id="pesoLivre" type="number" inputmode="numeric" min="50" step="50" placeholder="ex: 850"></div>' +
+      '<div class="recibo mono" id="pesoRecibo">Escolha uma quantidade</div>' +
+      '<div style="display:flex;gap:10px;margin-top:16px">' +
+        '<button class="btn btn-linha" type="button" id="pesoVoltar">Voltar</button>' +
+        '<button class="btn btn-viva" style="flex:1" type="button" id="pesoOk">Por no carrinho</button>' +
+      "</div>"
+    );
+
+    var escolhido = 0;
+
+    function marcar(q) {
+      escolhido = q;
+      Array.prototype.forEach.call(document.querySelectorAll(".peso-op"), function (b) {
+        b.setAttribute("aria-pressed", Number(b.dataset.q) === q ? "true" : "false");
+      });
+      $("pesoRecibo").innerHTML = q
+        ? "<div><span>" + emPeso(q) + "</span><span>" + dinheiro(p.p * q) + "</span></div>"
+        : "Escolha uma quantidade";
+    }
+
+    Array.prototype.forEach.call(document.querySelectorAll(".peso-op"), function (b) {
+      b.addEventListener("click", function () {
+        $("pesoLivre").value = "";
+        marcar(Number(b.dataset.q));
+      });
+    });
+
+    $("pesoLivre").addEventListener("input", function (e) {
+      var g = Number(e.target.value);
+      marcar(g >= 50 ? Math.round(g) / 1000 : 0);
+    });
+
+    $("pesoVoltar").addEventListener("click", fecharJanela);
+    $("pesoOk").addEventListener("click", function () {
+      if (!escolhido) { alert("Escolha quantos gramas voce quer."); return; }
+      adicionar(p, escolhido);
+      fecharJanela();
+    });
+
+    marcar(0.5);
+  }
+
   /* ---------- carrinho ---------- */
-  function adicionar(p) {
+  function adicionar(p, quanto) {
+    var passo = (p.u === "kg") ? (quanto || 1) : 1;
     var achou = carrinho.filter(function (x) { return x.id === p.id; })[0];
-    if (achou) achou.q += 1;
-    else carrinho.push({ id: p.id, n: p.n, p: p.p, s: p.s, foto: p.foto, q: 1 });
+    if (achou) achou.q = Math.round((achou.q + passo) * 1000) / 1000;
+    else carrinho.push({ id: p.id, n: p.n, p: p.p, s: p.s, u: p.u, arte: p.arte, foto: p.foto, q: passo });
     atualizarCarrinho();
     abrirCarrinho(true);
   }
@@ -211,19 +297,25 @@
       var d = document.createElement("div");
       d.className = "linha";
       d.innerHTML =
-        '<div class="linha-foto">' + (x.foto ? '<img src="' + x.foto + '" alt="">' : "") + "</div>" +
+        '<div class="linha-foto">' + (x.foto ? '<img src="' + x.foto + '" alt="">' : desenho(x)) + "</div>" +
         '<div class="linha-info"><div class="linha-nome">' + x.n + "</div>" +
-        '<div class="linha-preco mono">' + dinheiro(x.p) + " cada</div></div>" +
-        '<div class="qtd"><button type="button" aria-label="Tirar um">-</button>' +
-        '<span class="mono">' + x.q + "</span>" +
-        '<button type="button" aria-label="Por mais um">+</button></div>';
+        '<div class="linha-preco mono">' + (x.u === "kg"
+            ? emPeso(x.q) + " · " + dinheiro(x.p * x.q)
+            : dinheiro(x.p) + " cada") + "</div></div>" +
+        '<div class="qtd"><button type="button" aria-label="Tirar">-</button>' +
+        '<span class="mono">' + (x.u === "kg" ? emPeso(x.q) : x.q) + "</span>" +
+        '<button type="button" aria-label="Por mais">+</button></div>';
       var bts = d.querySelectorAll(".qtd button");
+      var passo = (x.u === "kg") ? 0.1 : 1;
       bts[0].addEventListener("click", function () {
-        x.q -= 1;
+        x.q = Math.round((x.q - passo) * 1000) / 1000;
         if (x.q <= 0) carrinho = carrinho.filter(function (y) { return y.id !== x.id; });
         atualizarCarrinho();
       });
-      bts[1].addEventListener("click", function () { x.q += 1; atualizarCarrinho(); });
+      bts[1].addEventListener("click", function () {
+        x.q = Math.round((x.q + passo) * 1000) / 1000;
+        atualizarCarrinho();
+      });
       lista.appendChild(d);
     });
   }
@@ -296,7 +388,7 @@
       entrega: { bairro: t.bairro, taxa: t.valor, minutos: t.minutos },
       pagamento: $("cPag").value,
       observacao: $("cObs").value.trim(),
-      itens: carrinho.map(function (x) { return { n: x.n, q: x.q, p: x.p, s: x.s }; }),
+      itens: carrinho.map(function (x) { return { n: x.n, q: x.q, p: x.p, s: x.s, u: x.u }; }),
       subtotal: prod,
       total: prod + t.valor,
       status: "Recebido",

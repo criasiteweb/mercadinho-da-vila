@@ -416,3 +416,23 @@ button{font-family:inherit}
   .carrinho-fundo{right:-16%;width:130%;opacity:.055}
 }
 @media (prefers-reduced-motion: reduce){ .carrinho-fundo{animation:none} }
+
+/* ---------------- venda por peso ---------------- */
+.por-kg{display:block;font-style:normal;font-size:11px;font-weight:700;color:var(--apagado);letter-spacing:.04em}
+.item-arte{width:62%;height:62%;color:var(--linha-forte);transition:color .3s ease,transform .35s ease}
+.item:hover .item-arte{color:var(--viva);transform:scale(1.07)}
+.linha-foto .item-arte{width:70%;height:70%}
+
+.peso-grade{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin-top:16px}
+@media(max-width:480px){.peso-grade{grid-template-columns:repeat(2,1fr)}}
+.peso-op{
+  display:flex;flex-direction:column;align-items:center;gap:3px;
+  padding:13px 6px;border:1.5px solid var(--linha-forte);border-radius:12px;
+  background:#fff;cursor:pointer;transition:.16s ease;
+}
+.peso-op b{font-size:16px}
+.peso-op span{font-size:12.5px;color:var(--apagado)}
+.peso-op:hover{border-color:var(--viva)}
+.peso-op[aria-pressed="true"]{border-color:var(--viva);background:var(--viva-fraca)}
+.peso-op[aria-pressed="true"] span{color:var(--viva)}
+.peso-op:focus-visible{outline:3px solid var(--tinta);outline-offset:2px}

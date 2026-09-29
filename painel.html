@@ -81,7 +81,10 @@
     var d = document.createElement("article");
     d.className = "ficha" + (novos[p.numero] ? " nova" : "");
     var itens = p.itens.map(function(i){
-      return "<div><span>"+i.q+"x "+i.n+"</span><span>"+dinheiro(i.p*i.q)+"</span></div>";
+      var q = (i.u === "kg")
+        ? (i.q < 1 ? Math.round(i.q*1000)+" g" : String(i.q).replace(".",",")+" kg")
+        : i.q + "x";
+      return "<div><span>"+q+" "+i.n+"</span><span>"+dinheiro(i.p*i.q)+"</span></div>";
     }).join("");
     var setores = {};
     p.itens.forEach(function(i){ setores[i.s]=true; });
