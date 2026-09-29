@@ -139,7 +139,7 @@ button{font-family:inherit}
   line-height:.96;
   max-width:16ch;
 }
-.titulao .ln{display:block;overflow:hidden}
+.titulao .ln{display:block;overflow:hidden;padding-bottom:.09em;margin-bottom:-.09em}
 .titulao .ln > i{display:block;font-style:normal;transform:translateY(105%);animation:subir .85s cubic-bezier(.16,.9,.24,1) forwards}
 .titulao .ln:nth-child(2) > i{animation-delay:.09s}
 .titulao .ln:nth-child(3) > i{animation-delay:.18s}
