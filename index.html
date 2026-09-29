@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mercadinho da Vila | Mercado, adega, padaria e pet com entrega</title>
+<meta name="description" content="Mercado, adega, padaria e pet shop no mesmo carrinho, com entrega no seu bairro. Peça pelo site e acompanhe o pedido.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/estilo.css">
+</head>
+<body>
+
+<div class="status">
+  <div class="area">
+    <span class="status-item"><i class="pulso"></i> Loja aberta agora</span>
+    <span class="status-item mono">Entrega media <b id="stMedia">38 min</b></span>
+    <span class="status-item mono">Pedidos hoje <b id="stPedidos">0</b></span>
+    <span class="status-item">Sem comissao. O preco e o da loja</span>
+  </div>
+</div>
+
+<header class="topo">
+  <div class="area topo-linha">
+    <a class="marca" href="#topo">
+      <span class="marca-selo" aria-hidden="true">MV</span>
+      <span>Mercadinho da Vila</span>
+    </a>
+
+    <div class="busca">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true">
+        <circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/>
+      </svg>
+      <label class="so-leitor" for="busca">Buscar produto</label>
+      <input id="busca" type="search" placeholder="Buscar em todo o mercado" autocomplete="off">
+    </div>
+
+    <button class="btn btn-viva" id="abrirCarrinho" type="button">
+      Carrinho <span class="contador" id="contaCarrinho">0</span>
+    </button>
+  </div>
+</header>
+
+<main id="topo">
+
+  <section class="abertura">
+    <div class="malha" aria-hidden="true"></div>
+    <div class="area">
+      <span class="etiqueta"><i class="pulso" style="width:7px;height:7px"></i> Mercado de bairro com entrega propria</span>
+
+      <h1 class="titulao">
+        <span class="ln"><i>Quatro lojas.</i></span>
+        <span class="ln"><i>Um carrinho.</i></span>
+        <span class="ln"><i><em>Uma entrega.</em></i></span>
+      </h1>
+
+      <p class="abertura-texto">
+        Mercado, adega, padaria e pet no mesmo pedido. Voce escolhe, o sistema separa,
+        a gente entrega. Sem aplicativo e sem comissao no meio do caminho.
+      </p>
+
+      <div class="placar">
+        <span class="placar-item"><b class="mono" id="plProdutos">0</b><span>produtos no catalogo</span></span>
+        <span class="placar-item"><b class="mono">4</b><span>setores</span></span>
+        <span class="placar-item"><b class="mono">38 min</b><span>entrega media</span></span>
+        <span class="placar-item"><b class="mono">0%</b><span>de comissao</span></span>
+      </div>
+    </div>
+  </section>
+
+  <div class="abas-barra">
+    <div class="area">
+      <div class="abas" role="tablist" aria-label="Setores da loja" id="abas"></div>
+    </div>
+  </div>
+
+  <section class="vitrine">
+    <div class="area">
+      <div class="vitrine-topo">
+        <div>
+          <h2 id="vitrineTitulo">Mercado</h2>
+          <p id="vitrineChamada">Hortifruti, acougue, frios, mercearia, bebidas e limpeza</p>
+        </div>
+        <span class="vitrine-conta mono" id="vitrineConta"></span>
+      </div>
+
+      <div class="filtros" id="filtros"></div>
+      <div class="produtos" id="produtos"></div>
+      <div class="carregar" id="carregar"></div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="rodape">
+  <div class="area">
+    <span>Mercadinho da Vila, modelo de demonstracao da Cria Site</span>
+    <a href="painel.html">Painel da loja</a>
+  </div>
+</footer>
+
+<div class="sombra" id="sombra"></div>
+
+<aside class="carrinho" id="carrinho" aria-label="Carrinho de compras">
+  <div class="carrinho-topo">
+    <h2>Seu carrinho</h2>
+    <button class="fechar" id="fecharCarrinho" type="button" aria-label="Fechar carrinho">&times;</button>
+  </div>
+  <div class="carrinho-lista" id="carrinhoLista"></div>
+  <div class="carrinho-pe">
+    <p class="aviso-setores" id="avisoSetores"></p>
+    <div class="total"><span>Total dos produtos</span><b class="mono" id="carrinhoTotal">R$ 0,00</b></div>
+    <button class="btn btn-viva btn-bloco" id="irCheckout" type="button">Fechar pedido</button>
+  </div>
+</aside>
+
+<div class="janela" id="janela">
+  <div class="janela-caixa" id="janelaCaixa"></div>
+</div>
+
+<script src="assets/js/catalogo.js"></script>
+<script src="assets/js/loja.js"></script>
+<script src="assets/js/app.js"></script>
+</body>
+</html>

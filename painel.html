@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Painel da loja | Mercadinho da Vila</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/estilo.css">
+<style>
+  .painel{padding:26px 0 70px}
+  .painel-topo{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:22px}
+  .painel-topo h1{font-size:clamp(26px,3.6vw,40px)}
+  .colunas{display:grid;gap:16px}
+  @media(min-width:900px){.colunas{grid-template-columns:repeat(4,1fr)}}
+  .coluna{background:var(--papel);border:1px solid var(--linha);border-radius:var(--raio);padding:14px;min-height:220px}
+  .coluna h2{font-size:14px;letter-spacing:.07em;text-transform:uppercase;color:var(--apagado);margin-bottom:12px;display:flex;justify-content:space-between}
+  .ficha{background:#fff;border:1px solid var(--linha);border-radius:12px;padding:14px;margin-bottom:11px;animation:entrar .4s ease forwards}
+  .ficha.nova{border-color:var(--mercado);box-shadow:0 0 0 4px rgba(0,184,74,.14)}
+  .ficha-topo{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px}
+  .ficha-num{font-size:19px;font-weight:800}
+  .ficha-hora{font-size:13px;color:var(--apagado)}
+  .ficha-cliente{font-size:14px;font-weight:600}
+  .ficha-end{font-size:13px;color:var(--apagado);margin-bottom:8px}
+  .ficha-itens{font-size:13px;color:var(--apagado);border-top:1px dashed var(--linha-forte);padding-top:8px;margin-bottom:10px}
+  .ficha-itens div{display:flex;justify-content:space-between;padding:2px 0}
+  .ficha-total{display:flex;justify-content:space-between;font-weight:800;margin-bottom:10px}
+  .ficha button{width:100%;min-height:42px;border-radius:10px;border:0;background:var(--tinta);color:#fff;font-weight:700;cursor:pointer;font-size:14px}
+  .ficha button:hover{opacity:.9}
+  .tag{display:inline-block;padding:2px 8px;border-radius:999px;font-size:11px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;background:var(--papel);color:var(--apagado);margin-right:5px}
+  .nada{color:var(--apagado);font-size:14px;text-align:center;padding:22px 0}
+</style>
+</head>
+<body>
+
+<div class="status">
+  <div class="area">
+    <span class="status-item"><i class="pulso"></i> Painel ligado</span>
+    <span class="status-item mono">Pedidos hoje <b id="pHoje">0</b></span>
+    <span class="status-item mono">Faturamento <b id="pTotal">R$ 0,00</b></span>
+  </div>
+</div>
+
+<header class="topo">
+  <div class="area topo-linha">
+    <a class="marca" href="index.html">
+      <span class="marca-selo" aria-hidden="true">MV</span>
+      <span>Painel da loja</span>
+    </a>
+    <a class="btn btn-linha" href="index.html">Ver a loja</a>
+  </div>
+</header>
+
+<main class="painel">
+  <div class="area">
+    <div class="painel-topo">
+      <div>
+        <h1>Pedidos em tempo real</h1>
+        <p style="color:var(--apagado)">Todo pedido feito no site cai aqui na hora. Clique para avancar o status.</p>
+      </div>
+      <button class="btn btn-linha" id="limpar" type="button">Limpar o dia</button>
+    </div>
+
+    <div class="colunas" id="colunas"></div>
+  </div>
+</main>
+
+<script src="assets/js/loja.js"></script>
+<script>
+(function(){
+  var colunas = document.getElementById("colunas");
+  var novos = {};
+
+  function hora(t){
+    var d = new Date(t);
+    return ("0"+d.getHours()).slice(-2)+":"+("0"+d.getMinutes()).slice(-2);
+  }
+
+  function ficha(p){
+    var d = document.createElement("article");
+    d.className = "ficha" + (novos[p.numero] ? " nova" : "");
+    var itens = p.itens.map(function(i){
+      return "<div><span>"+i.q+"x "+i.n+"</span><span>"+dinheiro(i.p*i.q)+"</span></div>";
+    }).join("");
+    var setores = {};
+    p.itens.forEach(function(i){ setores[i.s]=true; });
+    var tags = Object.keys(setores).map(function(s){
+      var nome = SETORES.filter(function(x){return x.id===s;})[0];
+      return '<span class="tag">'+(nome?nome.nome:s)+"</span>";
+    }).join("");
+
+    var proximo = STATUS[STATUS.indexOf(p.status)+1];
+
+    d.innerHTML =
+      '<div class="ficha-topo"><span class="ficha-num mono">#'+p.numero+'</span>'+
+      '<span class="ficha-hora mono">'+hora(p.quando)+"</span></div>"+
+      '<div class="ficha-cliente">'+p.cliente.nome+" · "+p.cliente.fone+"</div>"+
+      '<div class="ficha-end">'+p.cliente.endereco+" · "+p.entrega.bairro+"</div>"+
+      "<div>"+tags+"</div>"+
+      '<div class="ficha-itens">'+itens+
+        "<div><span>Entrega</span><span>"+(p.entrega.taxa?dinheiro(p.entrega.taxa):"sem taxa")+"</span></div></div>"+
+      '<div class="ficha-total"><span>'+p.pagamento+'</span><span class="mono">'+dinheiro(p.total)+"</span></div>"+
+      (proximo ? '<button type="button">Marcar como '+proximo+"</button>" : "");
+
+    if (proximo) {
+      d.querySelector("button").addEventListener("click", function(){
+        Pedidos.mudarStatus(p.numero, proximo);
+        delete novos[p.numero];
+        desenhar();
+      });
+    }
+    return d;
+  }
+
+  function desenhar(){
+    var todos = Pedidos.todos();
+    colunas.innerHTML = "";
+    STATUS.forEach(function(st){
+      var lista = todos.filter(function(p){ return p.status === st; });
+      var c = document.createElement("section");
+      c.className = "coluna";
+      c.innerHTML = "<h2>"+st+"<span class='mono'>"+lista.length+"</span></h2>";
+      if (!lista.length) c.innerHTML += '<p class="nada">Nenhum pedido</p>';
+      lista.forEach(function(p){ c.appendChild(ficha(p)); });
+      colunas.appendChild(c);
+    });
+
+    var hoje = new Date().setHours(0,0,0,0);
+    var doDia = todos.filter(function(p){ return p.quando >= hoje; });
+    document.getElementById("pHoje").textContent = doDia.length;
+    document.getElementById("pTotal").textContent =
+      dinheiro(doDia.reduce(function(s,p){ return s + p.total; }, 0));
+  }
+
+  if (Pedidos.canal) {
+    Pedidos.canal.onmessage = function(e){
+      if (e.data && e.data.tipo === "novo") novos[e.data.pedido.numero] = true;
+      desenhar();
+    };
+  }
+  window.addEventListener("storage", desenhar);
+
+  document.getElementById("limpar").addEventListener("click", function(){
+    if (confirm("Apagar todos os pedidos do painel?")) {
+      localStorage.removeItem(Pedidos.chave);
+      desenhar();
+    }
+  });
+
+  desenhar();
+  setInterval(desenhar, 8000);
+})();
+</script>
+</body>
+</html>
