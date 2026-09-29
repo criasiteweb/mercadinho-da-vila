@@ -139,11 +139,22 @@ MAPA_PET = {
 }
 
 
+
+# Produto embalado nao e hortifruti: amendoim em saquinho, fruta em calda,
+# polpa congelada. Vai para a mercearia, junto com os iguais.
+EMBALADO = re.compile(
+    r"(?<![a-z0-9])(\d+\s?(g|gr|ml|l|un)|pacote|sache|sache|lata|pote|caixa|"
+    r"congelad\w*|desidratad\w*|cristalizad\w*|em calda|polpa|seco|seca|"
+    r"salgad\w*|torrad\w*|passas?)(?![a-z])"
+)
+
 def classificar(nome, grupo, d=""):
     if grupo == "pet":
         return MAPA_PET.get(d, d or "Pet em geral")
     n = sem_acento(nome)
     permitido = PERMITIDO.get(grupo)
+    if grupo == "hortifruti" and EMBALADO.search(n):
+        permitido = None   # solta as regras: vai cair em snack, conserva, doce...
     for rotulo, chaves in REGRAS:
         if permitido and rotulo not in permitido:
             continue
