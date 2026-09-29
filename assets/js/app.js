@@ -361,3 +361,54 @@
   desenhar();
   atualizarCarrinho();
 })();
+
+/* ---------- abertura: parede de produtos e frase que troca ---------- */
+(function () {
+  "use strict";
+
+  var comFoto = CATALOGO.filter(function (p) { return p.foto; });
+  if (!comFoto.length) return;
+
+  function sorteio(qtd) {
+    var fora = [];
+    for (var i = 0; i < qtd; i++) {
+      fora.push(comFoto[Math.floor(Math.random() * comFoto.length)]);
+    }
+    return fora;
+  }
+
+  function encher(id, qtd) {
+    var alvo = document.getElementById(id);
+    if (!alvo) return;
+    var itens = sorteio(qtd);
+    var html = itens.map(function (p) {
+      return '<div class="pd"><img src="' + p.foto + '" alt="" loading="lazy"></div>';
+    }).join("");
+    alvo.innerHTML = html + html;   /* duas voltas, para o laço não dar salto */
+  }
+
+  encher("fila1", 14);
+  encher("fila2", 14);
+  encher("fila3", 14);
+
+  /* a frase troca sozinha */
+  var troca = document.getElementById("troca");
+  if (troca) {
+    var frases = ["38 minutos.", "um carrinho.", "uma entrega.", "um clique."];
+    var k = 0;
+    setInterval(function () {
+      k = (k + 1) % frases.length;
+      troca.style.transition = "opacity .25s ease, transform .25s ease";
+      troca.style.opacity = "0";
+      troca.style.transform = "translateY(-8px)";
+      setTimeout(function () {
+        troca.textContent = frases[k];
+        troca.style.transform = "translateY(8px)";
+        setTimeout(function () {
+          troca.style.opacity = "1";
+          troca.style.transform = "translateY(0)";
+        }, 30);
+      }, 260);
+    }, 3200);
+  }
+})();

@@ -46,25 +46,46 @@
 
   <section class="abertura">
     <div class="malha" aria-hidden="true"></div>
-    <div class="area">
-      <span class="etiqueta"><i class="pulso" style="width:7px;height:7px"></i> Mercado de bairro com entrega propria</span>
 
-      <h1 class="titulao">
-        <span class="ln"><i>Quatro lojas.</i></span>
-        <span class="ln"><i>Um carrinho.</i></span>
-        <span class="ln"><i><em>Uma entrega.</em></i></span>
-      </h1>
+    <div class="area abertura-grade">
+      <div class="abertura-texto-lado">
+        <span class="etiqueta"><i class="pulso" style="width:7px;height:7px"></i> Loja aberta, entregando agora</span>
 
-      <p class="abertura-texto">
-        Mercado, adega, padaria e pet no mesmo pedido. Voce escolhe, o sistema separa,
-        a gente entrega. Sem aplicativo e sem comissao no meio do caminho.
-      </p>
+        <h1 class="titulao">
+          <span class="ln"><i>Tudo que</i></span>
+          <span class="ln"><i>o bairro</i></span>
+          <span class="ln"><i>precisa, <em>em</em></i></span>
+          <span class="ln"><i><em class="troca" id="troca">38 minutos.</em></i></span>
+        </h1>
 
-      <div class="placar">
-        <span class="placar-item"><b class="mono" id="plProdutos">0</b><span>produtos no catalogo</span></span>
-        <span class="placar-item"><b class="mono">4</b><span>setores</span></span>
-        <span class="placar-item"><b class="mono">38 min</b><span>entrega media</span></span>
-        <span class="placar-item"><b class="mono">0%</b><span>de comissao</span></span>
+        <p class="abertura-chamada">
+          Cinco lojas num carrinho so: mercado, hortifruti, adega, padaria e pet.
+          Voce escolhe, o sistema separa, a moto sai.
+        </p>
+
+        <div class="abertura-botoes">
+          <a class="btn btn-viva" href="#abas">Comecar a comprar</a>
+          <a class="btn btn-linha" href="painel.html">Ver o painel da loja</a>
+        </div>
+
+        <div class="placar">
+          <span class="placar-item"><b class="mono" id="plProdutos">0</b><span>produtos</span></span>
+          <span class="placar-item"><b class="mono">5</b><span>setores</span></span>
+          <span class="placar-item"><b class="mono">0%</b><span>de comissao</span></span>
+        </div>
+      </div>
+
+      <div class="parede" aria-hidden="true">
+        <div class="parede-fila" id="fila1"></div>
+        <div class="parede-fila reverso" id="fila2"></div>
+        <div class="parede-fila" id="fila3"></div>
+        <div class="parede-brilho"></div>
+
+        <div class="recibo-vivo" id="reciboVivo">
+          <div class="rv-topo"><span class="rv-num mono">#1042</span><span class="rv-tag">Saiu para entrega</span></div>
+          <div class="rv-barra"><i></i></div>
+          <div class="rv-pe mono">Vila Nova · 38 min</div>
+        </div>
       </div>
     </div>
   </section>
