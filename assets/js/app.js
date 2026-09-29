@@ -5,7 +5,8 @@
 
   var PAGINA = 48;
   var setorAtivo = SETORES[0].id;
-  var filtroAtivo = "";
+  var depAtivo = "";
+  var catAtiva = "";
   var termo = "";
   var mostrando = PAGINA;
   var carrinho = [];
@@ -13,7 +14,8 @@
   var $ = function (id) { return document.getElementById(id); };
   var elAbas = $("abas");
   var elProdutos = $("produtos");
-  var elFiltros = $("filtros");
+  var elMenu = $("menu");
+  var elTrilha = $("trilha");
   var elCarregar = $("carregar");
 
   function semAcento(s) {
@@ -55,7 +57,8 @@
 
   function trocarSetor(id) {
     setorAtivo = id;
-    filtroAtivo = "";
+    depAtivo = "";
+    catAtiva = "";
     termo = "";
     $("busca").value = "";
     mostrando = PAGINA;
@@ -66,45 +69,83 @@
     var s = SETORES.filter(function (x) { return x.id === id; })[0];
     $("vitrineTitulo").textContent = s.nome;
     $("vitrineChamada").textContent = s.chamada;
-    montarFiltros();
+    montarMenu();
+    montarTrilha();
     desenhar();
     var barra = document.querySelector(".abas-barra");
     if (window.scrollY > barra.offsetTop) barra.scrollIntoView({ block: "start" });
   }
 
-  /* ---------- filtros do setor ---------- */
-  function montarFiltros() {
+  /* ---------- menu de departamentos e subcategorias ---------- */
+  function montarMenu() {
     var doSetor = CATALOGO.filter(function (p) { return p.s === setorAtivo; });
-    var contas = {};
-    doSetor.forEach(function (p) { contas[p.d] = (contas[p.d] || 0) + 1; });
-    var nomes = Object.keys(contas).sort(function (a, b) { return contas[b] - contas[a]; }).slice(0, 18);
+    var mapa = {};
+    doSetor.forEach(function (p) {
+      if (!mapa[p.dp]) mapa[p.dp] = { total: 0, cats: {} };
+      mapa[p.dp].total += 1;
+      mapa[p.dp].cats[p.c] = (mapa[p.dp].cats[p.c] || 0) + 1;
+    });
 
-    elFiltros.innerHTML = "";
-    if (!nomes.length) return;
+    var deps = Object.keys(mapa).sort(function (a, b) { return mapa[b].total - mapa[a].total; });
+    elMenu.innerHTML = "";
 
-    var todos = document.createElement("button");
-    todos.className = "filtro";
-    todos.type = "button";
-    todos.textContent = "Tudo";
-    todos.setAttribute("aria-pressed", "true");
-    todos.addEventListener("click", function () { filtroAtivo = ""; mostrando = PAGINA; montarFiltros(); desenhar(); });
-    elFiltros.appendChild(todos);
+    var tudo = document.createElement("button");
+    tudo.type = "button";
+    tudo.className = "menu-tudo" + (!depAtivo && !catAtiva ? " ativo" : "");
+    tudo.innerHTML = "Ver tudo <span class='mono'>" + doSetor.length.toLocaleString("pt-BR") + "</span>";
+    tudo.addEventListener("click", function () { depAtivo = ""; catAtiva = ""; mostrando = PAGINA; montarMenu(); desenhar(); });
+    elMenu.appendChild(tudo);
 
-    nomes.forEach(function (n) {
-      var b = document.createElement("button");
-      b.className = "filtro";
-      b.type = "button";
-      b.textContent = n;
-      b.setAttribute("aria-pressed", filtroAtivo === n ? "true" : "false");
-      if (filtroAtivo === n) todos.setAttribute("aria-pressed", "false");
-      b.addEventListener("click", function () {
-        filtroAtivo = (filtroAtivo === n) ? "" : n;
+    deps.forEach(function (d) {
+      var bloco = document.createElement("div");
+      bloco.className = "menu-dep" + (depAtivo === d ? " aberto" : "");
+
+      var cab = document.createElement("button");
+      cab.type = "button";
+      cab.className = "menu-cab" + (depAtivo === d && !catAtiva ? " ativo" : "");
+      cab.setAttribute("aria-expanded", depAtivo === d ? "true" : "false");
+      cab.innerHTML = "<span>" + d + "</span><span class='mono'>" + mapa[d].total.toLocaleString("pt-BR") + "</span>";
+      cab.addEventListener("click", function () {
+        depAtivo = (depAtivo === d) ? "" : d;
+        catAtiva = "";
         mostrando = PAGINA;
-        montarFiltros();
+        montarMenu();
         desenhar();
       });
-      elFiltros.appendChild(b);
+      bloco.appendChild(cab);
+
+      var lista = document.createElement("div");
+      lista.className = "menu-cats";
+      Object.keys(mapa[d].cats)
+        .sort(function (a, b) { return mapa[d].cats[b] - mapa[d].cats[a]; })
+        .forEach(function (c) {
+          var b = document.createElement("button");
+          b.type = "button";
+          b.className = "menu-cat" + (catAtiva === c ? " ativo" : "");
+          b.innerHTML = "<span>" + c + "</span><span class='mono'>" + mapa[d].cats[c] + "</span>";
+          b.addEventListener("click", function () {
+            depAtivo = d;
+            catAtiva = (catAtiva === c) ? "" : c;
+            mostrando = PAGINA;
+            montarMenu();
+            desenhar();
+            document.querySelector(".vitrine-grade").scrollIntoView({ block: "start" });
+          });
+          lista.appendChild(b);
+        });
+      bloco.appendChild(lista);
+      elMenu.appendChild(bloco);
     });
+  }
+
+  function montarTrilha() {
+    var s = SETORES.filter(function (x) { return x.id === setorAtivo; })[0];
+    var caminho = [s.nome];
+    if (depAtivo) caminho.push(depAtivo);
+    if (catAtiva) caminho.push(catAtiva);
+    elTrilha.innerHTML = caminho.map(function (t, i) {
+      return (i ? '<i class="sep">/</i>' : "") + "<span>" + t + "</span>";
+    }).join("");
   }
 
   /* ---------- lista atual ---------- */
@@ -113,7 +154,8 @@
     return CATALOGO.filter(function (p) {
       if (t) return p._b.indexOf(t) !== -1;
       if (p.s !== setorAtivo) return false;
-      if (filtroAtivo && p.d !== filtroAtivo) return false;
+      if (catAtiva) return p.c === catAtiva;
+      if (depAtivo) return p.dp === depAtivo;
       return true;
     });
   }
@@ -169,6 +211,7 @@
   }
 
   function desenhar() {
+    montarTrilha();
     var itens = lista();
     $("vitrineConta").textContent = itens.length
       ? itens.length.toLocaleString("pt-BR") + " produtos"
@@ -421,6 +464,12 @@
   }
 
   /* ---------- ligações ---------- */
+  $("menuAbrir").addEventListener("click", function () {
+    var m = $("menu");
+    var aberto = m.classList.toggle("aberto");
+    $("menuAbrir").textContent = aberto ? "Fechar departamentos" : "Departamentos";
+  });
+
   $("abrirCarrinho").addEventListener("click", function () { abrirCarrinho(true); });
   $("fecharCarrinho").addEventListener("click", function () { abrirCarrinho(false); });
   $("sombra").addEventListener("click", function () { abrirCarrinho(false); });
@@ -449,7 +498,8 @@
   contarPedidos();
   pintar(setorAtivo);
   montarAbas();
-  montarFiltros();
+  montarMenu();
+  montarTrilha();
   desenhar();
   atualizarCarrinho();
 })();

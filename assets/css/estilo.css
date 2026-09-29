@@ -436,3 +436,51 @@ button{font-family:inherit}
 .peso-op[aria-pressed="true"]{border-color:var(--viva);background:var(--viva-fraca)}
 .peso-op[aria-pressed="true"] span{color:var(--viva)}
 .peso-op:focus-visible{outline:3px solid var(--tinta);outline-offset:2px}
+
+/* ---------------- menu de departamentos ---------------- */
+.vitrine-grade{display:grid;gap:22px;align-items:start}
+@media(min-width:900px){.vitrine-grade{grid-template-columns:260px minmax(0,1fr);gap:28px}}
+
+.menu-abrir{display:none;margin-bottom:14px}
+@media(max-width:899px){
+  .menu-abrir{display:inline-flex}
+  .menu{display:none}
+  .menu.aberto{display:block}
+}
+
+.menu{
+  position:sticky;top:calc(var(--topo-h) + 76px);
+  border:1px solid var(--linha);border-radius:var(--raio);
+  background:#fff;padding:8px;
+  max-height:calc(100vh - var(--topo-h) - 110px);overflow-y:auto;
+}
+.menu::-webkit-scrollbar{width:8px}
+.menu::-webkit-scrollbar-thumb{background:var(--linha-forte);border-radius:99px}
+
+.menu-tudo,.menu-cab,.menu-cat{
+  display:flex;align-items:center;justify-content:space-between;gap:10px;
+  width:100%;text-align:left;border:0;background:transparent;cursor:pointer;
+  font-family:inherit;border-radius:10px;
+  transition:background .16s ease,color .16s ease;
+}
+.menu-tudo{padding:12px 12px;font-size:15px;font-weight:800;margin-bottom:4px}
+.menu-tudo .mono,.menu-cab .mono,.menu-cat .mono{font-size:12px;color:var(--apagado);font-weight:700}
+.menu-tudo:hover,.menu-cab:hover,.menu-cat:hover{background:var(--papel)}
+.menu-tudo.ativo,.menu-cab.ativo{background:var(--viva-fraca);color:var(--viva)}
+.menu-tudo.ativo .mono,.menu-cab.ativo .mono{color:var(--viva)}
+
+.menu-dep{border-top:1px solid var(--linha)}
+.menu-dep:first-of-type{border-top:0}
+.menu-cab{padding:12px;font-size:14.5px;font-weight:700}
+.menu-cab::after{content:"";width:8px;height:8px;border-right:2px solid var(--apagado);border-bottom:2px solid var(--apagado);transform:rotate(45deg);margin-left:2px;transition:transform .2s ease;flex:0 0 8px}
+.menu-dep.aberto .menu-cab::after{transform:rotate(-135deg)}
+
+.menu-cats{display:none;padding:0 6px 10px}
+.menu-dep.aberto .menu-cats{display:block}
+.menu-cat{padding:9px 12px;font-size:14px;color:var(--apagado);font-weight:600}
+.menu-cat.ativo{background:var(--viva);color:#fff}
+.menu-cat.ativo .mono{color:rgba(255,255,255,.8)}
+
+.trilha{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:14px;font-size:14px;color:var(--apagado)}
+.trilha span:last-child{color:var(--tinta);font-weight:700}
+.trilha .sep{font-style:normal;opacity:.5}

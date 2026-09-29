@@ -96,6 +96,25 @@ TROCO_GRUPO = {
 }
 
 
+
+# Cada grupo de origem so pode cair nas suas proprias categorias.
+# Sem isso, sabao em po com aroma de lavanda virava "Doce e sobremesa".
+PERMITIDO = {
+    "mercearia": ["Arroz","Feijao","Macarrao e massa","Molho de tomate","Oleo e azeite",
+                  "Acucar e adocante","Sal e tempero","Farinha e fuba","Cafe e achocolatado",
+                  "Leite","Biscoito e bolacha","Doce e sobremesa","Enlatado e conserva",
+                  "Matinais e cereal","Salgadinho e snack","Alimento infantil","Suplemento"],
+    "hortifruti":["Frutas","Verduras e legumes","Ovos","Temperos frescos"],
+    "acougue":   ["Carne bovina","Frango","Carne suina","Linguica e embutido"],
+    "peixaria":  ["Peixe e frutos do mar"],
+    "frios":     ["Queijo","Iogurte e bebida lactea","Manteiga e margarina","Congelados",
+                  "Sorvete","Linguica e embutido","Leite"],
+    "bebidas":   ["Refrigerante","Suco e refresco","Agua","Cha e energetico"],
+    "limpeza":   ["Limpeza da casa","Roupa","Descartavel","Higiene pessoal"],
+    "bazar":     ["Casa e utilidade","Papelaria","Festa","Automotivo","Higiene pessoal",
+                  "Descartavel"],
+}
+
 REGRAS_PET = [r for r in REGRAS if r[0].endswith(" pet") or "Racao" in r[0] or r[0] == "Passaro e outros"]
 
 _cache = {}
@@ -124,14 +143,54 @@ def classificar(nome, grupo, d=""):
     if grupo == "pet":
         return MAPA_PET.get(d, d or "Pet em geral")
     n = sem_acento(nome)
-    regras = REGRAS
-    for rotulo, chaves in regras:
+    permitido = PERMITIDO.get(grupo)
+    for rotulo, chaves in REGRAS:
+        if permitido and rotulo not in permitido:
+            continue
         for c in chaves:
             if _casa(c, n):
                 return rotulo
     return TROCO_GRUPO.get(grupo, "Outros")
 
 
+
+
+# ---------------------------------------------------------------- departamentos
+# Organizacao em dois niveis, como nos supermercados online:
+# departamento (Alimentos basicos) -> categoria (Arroz, Feijao, Molho de tomate...)
+DEPARTAMENTOS = [
+    ("Alimentos basicos", ["Arroz", "Feijao", "Macarrao e massa", "Molho de tomate",
+                           "Oleo e azeite", "Acucar e adocante", "Sal e tempero",
+                           "Farinha e fuba", "Enlatado e conserva", "Mercearia"]),
+    ("Matinais e doces",  ["Cafe e achocolatado", "Leite", "Biscoito e bolacha",
+                           "Matinais e cereal", "Doce e sobremesa", "Salgadinho e snack",
+                           "Alimento infantil", "Suplemento"]),
+    ("Acougue e peixaria",["Carne bovina", "Frango", "Carne suina", "Linguica e embutido",
+                           "Peixe e frutos do mar", "Acougue", "Peixaria"]),
+    ("Frios e congelados",["Queijo", "Iogurte e bebida lactea", "Manteiga e margarina",
+                           "Frios e laticinios", "Congelados", "Sorvete"]),
+    ("Bebidas",           ["Refrigerante", "Suco e refresco", "Agua", "Cha e energetico", "Bebidas"]),
+    ("Limpeza",           ["Limpeza da casa", "Roupa", "Descartavel", "Limpeza"]),
+    ("Higiene e beleza",  ["Higiene pessoal"]),
+    ("Casa e bazar",      ["Casa e utilidade", "Papelaria", "Festa", "Automotivo", "Bazar"]),
+
+    ("Hortifruti",        ["Frutas", "Verduras e legumes", "Ovos", "Temperos frescos"]),
+    ("Adega",             ["Cerveja", "Vinho", "Destilado", "Gelo e acompanhamento"]),
+    ("Padaria",           ["Pao", "Salgado e lanche", "Doce e confeitaria",
+                           "Frios fatiados na hora", "Cafe da manha"]),
+    ("Pet",               ["Racao de cachorro", "Racao de gato", "Petisco de cachorro",
+                           "Petisco de gato", "Cuidado e higiene", "Limpeza e areia",
+                           "Acessorio", "Passaro e roedor", "Pet em geral"]),
+]
+
+DE_CAT = {}
+for _d, _cats in DEPARTAMENTOS:
+    for _c in _cats:
+        DE_CAT[_c] = _d
+
+
+def departamento(categoria):
+    return DE_CAT.get(categoria, "Outros")
 
 # ---------------------------------------------------------------- unidade de venda
 # "kg" = vendido por peso, o cliente escolhe quantos gramas.
@@ -174,6 +233,7 @@ for p in prods:
         "id": p["id"],
         "s": setor,
         "c": cat,
+        "dp": departamento(cat),
         "n": p["n"],
         "p": p["p"],
         "u": unidade(p["n"], cat),
@@ -348,6 +408,7 @@ def montar(setor, blocos, prefixo):
                 "id": prefixo + str(k),
                 "s": setor,
                 "c": categoria,
+                "dp": departamento(categoria),
                 "n": nome,
                 "p": preco,
                 "u": unidade(nome, categoria),
@@ -430,6 +491,9 @@ io.open(DESTINO, "w", encoding="utf-8").write(
 )
 
 print("total:", len(catalogo), dict(conta))
+for _s in ("mercado","horti","adega","padaria","pet"):
+    _d = collections.Counter(p["dp"] for p in catalogo if p["s"] == _s)
+    print("\ndepartamentos de", _s, "->", dict(_d))
 print("\npor unidade de venda:", dict(collections.Counter(p["u"] for p in catalogo)))
 for s in ("mercado", "horti", "adega", "padaria", "pet"):
     cats = collections.Counter(p["c"] for p in catalogo if p["s"] == s)
