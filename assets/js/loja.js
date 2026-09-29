@@ -67,3 +67,24 @@ const STATUS = ["Recebido", "Separando", "Saiu para entrega", "Entregue"];
 function dinheiro(v) {
   return "R$ " + Number(v).toFixed(2).replace(".", ",");
 }
+
+/* Ponte com o portal da loja: o que o dono marca no portal vale no site.
+   Estoque zerado ou marcado como esgotado some do carrinho, e loja fechada
+   avisa antes de o cliente terminar o pedido. */
+const Vitrine = {
+  estoque() {
+    try { return JSON.parse(localStorage.getItem("mj_estoque")) || {}; }
+    catch (e) { return {}; }
+  },
+  esgotado(idProduto) {
+    const i = this.estoque()[idProduto];
+    if (!i) return false;
+    return !!i.esgotado || (i.q !== null && i.q !== undefined && i.q <= 0);
+  },
+  lojaAberta() {
+    try {
+      const c = JSON.parse(localStorage.getItem("mj_config"));
+      return !c || c.lojaAberta !== false;
+    } catch (e) { return true; }
+  }
+};

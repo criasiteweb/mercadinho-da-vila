@@ -303,10 +303,14 @@
 
   /* ---------- carrinho ---------- */
   function adicionar(p, quanto) {
+    if (Vitrine.esgotado(p.id)) {
+      alert("Esse produto acabou no mercado. A loja marcou como esgotado no portal.");
+      return;
+    }
     var passo = (p.u === "kg") ? (quanto || 1) : 1;
     var achou = carrinho.filter(function (x) { return x.id === p.id; })[0];
     if (achou) achou.q = Math.round((achou.q + passo) * 1000) / 1000;
-    else carrinho.push({ id: p.id, n: p.n, p: p.p, s: p.s, u: p.u, arte: p.arte, foto: p.foto, q: passo });
+    else carrinho.push({ id: p.id, n: p.n, p: p.p, s: p.s, u: p.u, c: p.c, dp: p.dp, arte: p.arte, foto: p.foto, q: passo });
     atualizarCarrinho();
     abrirCarrinho(true);
   }
@@ -420,6 +424,7 @@
     var endereco = $("cEndereco").value.trim();
     var t = LOJA.taxas[Number($("cBairro").value)];
 
+    if (!Vitrine.lojaAberta() && !confirm("O mercado esta fechado agora. Quer deixar o pedido mesmo assim, para ser separado na abertura?")) return;
     if (!nome || !fone) { alert("Preencha nome e telefone."); return; }
     if (t.valor > 0 && !endereco) { alert("Preencha o endereco da entrega."); return; }
 
@@ -431,7 +436,7 @@
       entrega: { bairro: t.bairro, taxa: t.valor, minutos: t.minutos },
       pagamento: $("cPag").value,
       observacao: $("cObs").value.trim(),
-      itens: carrinho.map(function (x) { return { n: x.n, q: x.q, p: x.p, s: x.s, u: x.u }; }),
+      itens: carrinho.map(function (x) { return { id: x.id, n: x.n, q: x.q, p: x.p, s: x.s, u: x.u, c: x.c, dp: x.dp }; }),
       subtotal: prod,
       total: prod + t.valor,
       status: "Recebido",
